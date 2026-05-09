@@ -146,7 +146,7 @@
       ansible.builtin.pip:
         requirements: /opt/spiderfoot/requirements.txt
         executable: pip3
-        extra_args: --break-system-packages
+        extra_args: --break-system-packages --ignore-installed
 
     # ─── Sherlock ───────────────────────────────────────────────
     - name: Clone Sherlock from GitHub
