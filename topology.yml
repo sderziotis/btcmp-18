@@ -1,3 +1,4 @@
+# Main topology
 name: btcmp-18-main
 hosts:
   - name: inv1
@@ -39,10 +40,15 @@ net_mappings:
     network: network-2
     ip: 192.168.0.10
   - host: lab1
-    network: network-1
-    ip: 10.10.10.10
+    network: network-3
+    ip: 192.168.10.10
 router_mappings:
   - router: router-1
     network: network-2
     ip: 192.168.0.1
+  - router: router-1
+    network: network-3
+    ip: 192.168.10.1
 groups: []
+
+
