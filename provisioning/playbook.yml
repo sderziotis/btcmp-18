@@ -149,17 +149,11 @@
         extra_args: --break-system-packages --ignore-installed
 
     # ─── Sherlock ───────────────────────────────────────────────
-    - name: Clone Sherlock from GitHub
-      ansible.builtin.git:
-        repo: https://github.com/sherlock-project/sherlock.git
-        dest: /opt/sherlock
-        version: master
-
-    - name: Install Sherlock dependencies
+    - name: Install Sherlock via pip
       ansible.builtin.pip:
-        requirements: /opt/sherlock/sherlock_project/requirements.txt
+        name: sherlock-project
         executable: pip3
-        extra_args: --break-system-packages --ignore-installed
+        extra_args: --break-system-packages
 
   # ─── Role ─────────────────────────────────────────────────────
   roles:
