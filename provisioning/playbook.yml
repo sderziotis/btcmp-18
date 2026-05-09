@@ -157,9 +157,9 @@
 
     - name: Install Sherlock dependencies
       ansible.builtin.pip:
-        requirements: /opt/sherlock/requirements.txt
+        requirements: /opt/sherlock/sherlock_project/requirements.txt
         executable: pip3
-        extra_args: --break-system-packages
+        extra_args: --break-system-packages --ignore-installed
 
   # ─── Role ─────────────────────────────────────────────────────
   roles:
