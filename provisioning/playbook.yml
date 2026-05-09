@@ -197,6 +197,80 @@
         groups: docker
         append: true
 
+    # ─── Tor Browser ────────────────────────────────────────────
+    - name: Add Tor Project apt repository key
+      ansible.builtin.shell:
+        cmd: >
+          wget -qO- https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc |
+          gpg --dearmor -o /etc/apt/keyrings/tor.gpg
+        creates: /etc/apt/keyrings/tor.gpg
+
+    - name: Add Tor Project apt repository
+      ansible.builtin.shell:
+        cmd: >
+          echo
+          "deb [signed-by=/etc/apt/keyrings/tor.gpg]
+          https://deb.torproject.org/torproject.org noble main" |
+          tee /etc/apt/sources.list.d/tor.list > /dev/null
+        creates: /etc/apt/sources.list.d/tor.list
+
+    - name: Update apt after adding Tor repo
+      ansible.builtin.apt:
+        update_cache: 'yes'
+
+    - name: Install Tor Browser launcher
+      ansible.builtin.apt:
+        name:
+          - tor
+          - torbrowser-launcher
+        state: present
+
+    # ─── Maltego CE ─────────────────────────────────────────────
+    - name: Download Maltego CE deb package
+      ansible.builtin.get_url:
+        url: https://downloads.maltego.com/maltego-v4/linux/Maltego.v4.8.0.deb
+        dest: /tmp/maltego.deb
+        mode: '0644'
+
+    - name: Install Maltego CE
+      ansible.builtin.apt:
+        deb: /tmp/maltego.deb
+        state: present
+
+    - name: Remove Maltego deb package
+      ansible.builtin.file:
+        path: /tmp/maltego.deb
+        state: absent
+
+    # ─── SpiderFoot ─────────────────────────────────────────────
+    - name: Clone SpiderFoot from GitHub
+      ansible.builtin.git:
+        repo: https://github.com/smicallef/spiderfoot.git
+        dest: /opt/spiderfoot
+        version: master
+
+    - name: Install SpiderFoot dependencies
+      ansible.builtin.pip:
+        requirements: /opt/spiderfoot/requirements.txt
+        executable: pip3
+        extra_args: --break-system-packages
+
+    # ─── Sherlock ───────────────────────────────────────────────
+    - name: Clone Sherlock from GitHub
+      ansible.builtin.git:
+        repo: https://github.com/sherlock-project/sherlock.git
+        dest: /opt/sherlock
+        version: master
+
+    - name: Install Sherlock dependencies
+      ansible.builtin.pip:
+        requirements: /opt/sherlock/requirements.txt
+        executable: pip3
+        extra_args: --break-system-packages
+
+
+
+
     # ─── Services ────────────────────────────────────────────────
     - name: Enable and start Apache2
       ansible.builtin.systemd:
