@@ -1,0 +1,224 @@
+# ─────────────────────────────────────────────
+#  MACHINE 1 - inv1
+# ─────────────────────────────────────────────
+- name: init machine inv1
+  hosts:
+    - inv1
+  become: true
+
+  tasks:
+    # apt packages
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - pipx
+          - nodejs
+          - npm
+          - git
+          - wget
+          - curl
+          - jq
+          - unzip
+          - zip
+          - build-essential
+          - firefox-esr
+          - chromium
+          - libimage-exiftool-perl
+          - ffmpeg
+          - imagemagick
+        state: present
+        update_cache: 'yes'
+
+    # ─── Docker ─────────────────────────────────────────────────
+    - name: Install Docker dependencies
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Create Docker keyring directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG key
+      ansible.builtin.shell:
+        cmd: >
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+          gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker apt repository
+      ansible.builtin.shell:
+        cmd: >
+          echo
+          "deb [arch=$(dpkg --print-architecture)
+          signed-by=/etc/apt/keyrings/docker.gpg]
+          https://download.docker.com/linux/ubuntu
+          $(lsb_release -cs) stable" |
+          tee /etc/apt/sources.list.d/docker.list > /dev/null
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Update apt after adding Docker repo
+      ansible.builtin.apt:
+        update_cache: 'yes'
+
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Enable and start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: user
+        groups: docker
+        append: true
+
+  # ─── Role ─────────────────────────────────────────────────────
+  roles:
+    - role: user-access
+      user_access_username: user
+      user_access_password: 'Password123'
+      user_access_sudo: true
+
+
+# ─────────────────────────────────────────────
+#  MACHINE 2 - lab1
+# ─────────────────────────────────────────────
+- name: init machine lab1
+  hosts:
+    - lab1
+  become: true
+
+  tasks:
+    # ─── APT packages ───────────────────────────────────────────
+    - name: Install base packages
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pip
+          - pipx
+          - nodejs
+          - npm
+          - git
+          - wget
+          - curl
+          - jq
+          - unzip
+          - zip
+          - rsync
+          - build-essential
+          - apache2
+          - php
+          - libapache2-mod-php
+          - php-fpm
+          - php-cli
+          - openssh-server
+          - cron
+          - sqlite3
+          - openssl
+          - net-tools
+          - dnsutils
+        state: present
+        update_cache: 'yes'
+
+    # ─── Docker ─────────────────────────────────────────────────
+    - name: Install Docker dependencies
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Create Docker keyring directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add Docker GPG key
+      ansible.builtin.shell:
+        cmd: >
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+          gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Add Docker apt repository
+      ansible.builtin.shell:
+        cmd: >
+          echo
+          "deb [arch=$(dpkg --print-architecture)
+          signed-by=/etc/apt/keyrings/docker.gpg]
+          https://download.docker.com/linux/ubuntu
+          $(lsb_release -cs) stable" |
+          tee /etc/apt/sources.list.d/docker.list > /dev/null
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Update apt after adding Docker repo
+      ansible.builtin.apt:
+        update_cache: 'yes'
+
+    - name: Install Docker Engine and Compose plugin
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    - name: Enable and start Docker service
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: user
+        groups: docker
+        append: true
+
+    # ─── Services ────────────────────────────────────────────────
+    - name: Enable and start Apache2
+      ansible.builtin.systemd:
+        name: apache2
+        enabled: true
+        state: started
+
+    - name: Enable OpenSSH server
+      ansible.builtin.systemd:
+        name: ssh
+        enabled: true
+        state: started
+
+    - name: Enable cron
+      ansible.builtin.systemd:
+        name: cron
+        enabled: true
+        state: started
+
+  # ─── Role ─────────────────────────────────────────────────────
+  roles:
+    - role: user-access
+      user_access_username: user
+      user_access_password: 'btcmp18@admin'
+      user_access_sudo: true
