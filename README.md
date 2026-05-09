@@ -23,14 +23,21 @@ The environment consists of two hosts each on their own internal network, both r
 ### INV1 — Investigator Workstation
 User `user` / `Password123` (sudo enabled).
 
-Software->Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin
+Software->Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin, TOr Browser, Maltego CE, SpiderFoot, Sherlock
+
+Notes:
+-Tor Browser is installed via torbrowser-launcher — the user runs torbrowser-launcher the first time to download and set it up.
+-Maltego CE version in the URL is 4.8.0 — if this goes stale you'll need to update the URL from https://www.maltego.com/downloads/.
+-SpiderFoot runs via python3 sf.py -l 127.0.0.1:5001 from /opt/spiderfoot.
+-Sherlock runs via python3 /opt/sherlock/sherlock <username>.
+
 
 ---
 
 ### LAB1 — Server Machine
 User `user` / `btcmp18@admin` (sudo enabled).
 
-Software-> Python3, pip, pipx, Node.js, npm, PHP 8.3, php-cli, php-fpm, Git, build-essential, Apache2, libapache2-mod-php, wget, curl, jq, unzip, zip, rsync, net-tools, dnsutils, openssl, OpenSSH Server, SQLite3, cron, Docker Engine, Docker Compose plugin
+Software-> Python3, pip, pipx, Node.js, npm, PHP 8.3, php-cli, php-fpm, Git, build-essential, Apache2, libapache2-mod-php, wget, curl, jq, unzip, zip, rsync, net-tools, dnsutils, openssl, OpenSSH Server, SQLite3, cron, Docker Engine, Docker Compose plugin, 
 
 **Services enabled at boot:** Apache2, OpenSSH, cron, Docker.
 
