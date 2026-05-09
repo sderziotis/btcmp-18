@@ -23,7 +23,7 @@
           - unzip
           - zip
           - build-essential
-          - firefox-esr
+          - firefox
           - chromium
           - libimage-exiftool-perl
           - ffmpeg
