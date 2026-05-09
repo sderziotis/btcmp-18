@@ -2,7 +2,7 @@
 
 ## Overview
 
-This lab environment is using **xubuntu-noble-x86_64** as the base image for both machines.
+This lab environment is using **xubuntu-noble-x86_64** as the base image for both machines. 
 
 ---
 
@@ -23,11 +23,11 @@ The environment consists of two hosts each on their own internal network, both r
 ### INV1 — Investigator Workstation
 User `user` / `Password123` (sudo enabled).
 
-Software->Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin, TOr Browser, Maltego CE, SpiderFoot, Sherlock
+Software->Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin, TOr Browser, Maltego CE, SpiderFoot, Sherlock, java
 
 Notes:
-- Tor Browser is installed via torbrowser-launcher — the user runs torbrowser-launcher the first time to download and set it up.
-- Maltego CE vers 4.8.0 — if this goes stale you'll need to update the URL on playbook from https://www.maltego.com/downloads/.
+- Tor Browser is installed via torbrowser-launcher — the user runs tor the first time to download and set it up.
+- Maltego CE vers 4.8.0 — if this goes stale you'll need to update the URL on playbook from https://www.maltego.com/downloads/. Also it asks for registration!!!
 - SpiderFoot runs via python3 sf.py -l 127.0.0.1:5001 from /opt/spiderfoot.
 - Sherlock runs via terminal sherlock <username>.
 
