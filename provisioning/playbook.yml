@@ -381,6 +381,18 @@
               CustomLog ${APACHE_LOG_DIR}/silvercompany_access.log combined
           </VirtualHost>
 
+    # ─── Enable Apache headers module ───────────────────────────
+    - name: Enable Apache headers module
+      ansible.builtin.command:
+        cmd: a2enmod headers
+        creates: /etc/apache2/mods-enabled/headers.load
+
+
+    - name: Enable Apache proxy modules for Famebook
+      ansible.builtin.command:
+        cmd: a2enmod proxy proxy_http
+        creates: /etc/apache2/mods-enabled/proxy.load
+
     - name: Enable silvercompany vhost
       ansible.builtin.command:
         cmd: a2ensite silvercompany.conf
@@ -441,12 +453,6 @@
         cmd: a2ensite bluefeather.conf
         creates: /etc/apache2/sites-enabled/bluefeather.conf
 
-    # ─── Enable Apache headers module ───────────────────────────
-    - name: Enable Apache headers module
-      ansible.builtin.command:
-        cmd: a2enmod headers
-        creates: /etc/apache2/mods-enabled/headers.load
-
     # ─── Famebook — Flask social media app ──────────────────────
     - name: Create Famebook app directory
       ansible.builtin.file:
@@ -503,11 +509,6 @@
               ErrorLog  ${APACHE_LOG_DIR}/famebook_error.log
               CustomLog ${APACHE_LOG_DIR}/famebook_access.log combined
           </VirtualHost>
-
-    - name: Enable Apache proxy modules for Famebook
-      ansible.builtin.command:
-        cmd: a2enmod proxy proxy_http
-        creates: /etc/apache2/mods-enabled/proxy.load
 
     - name: Enable famebook vhost
       ansible.builtin.command:
