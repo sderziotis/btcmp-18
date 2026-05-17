@@ -259,7 +259,7 @@
           - apache2
           - php
           - libapache2-mod-php
-         #- php-fpm
+          - php-fpm
           - php-cli
           - openssh-server
           - cron
@@ -331,6 +331,17 @@
         groups: docker
         append: true
 
+    # ─── Enable Apache modules FIRST (before any vhost is enabled) ─
+    - name: Enable Apache headers module
+      ansible.builtin.command:
+        cmd: a2enmod headers
+        creates: /etc/apache2/mods-enabled/headers.load
+
+    - name: Enable Apache proxy modules
+      ansible.builtin.command:
+        cmd: a2enmod proxy proxy_http
+        creates: /etc/apache2/mods-enabled/proxy.load
+
     # ─── Apache vhost config: silvercompany.com ─────────────────
     - name: Create silvercompany webroot
       ansible.builtin.file:
@@ -373,25 +384,12 @@
                   Require all granted
               </Directory>
 
-              ServerTokens Full
               Header always set X-Powered-By "PHP/8.3.1"
               Header always set X-Generator "WordPress/6.4.2"
 
               ErrorLog ${APACHE_LOG_DIR}/silvercompany_error.log
               CustomLog ${APACHE_LOG_DIR}/silvercompany_access.log combined
           </VirtualHost>
-
-    # ─── Enable Apache headers module ───────────────────────────
-    - name: Enable Apache headers module
-      ansible.builtin.command:
-        cmd: a2enmod headers
-        creates: /etc/apache2/mods-enabled/headers.load
-
-
-    - name: Enable Apache proxy modules for Famebook
-      ansible.builtin.command:
-        cmd: a2enmod proxy proxy_http
-        creates: /etc/apache2/mods-enabled/proxy.load
 
     - name: Enable silvercompany vhost
       ansible.builtin.command:
@@ -440,7 +438,6 @@
                   Require all granted
               </Directory>
 
-              ServerTokens Full
               Header always set X-Powered-By "PHP/8.3.1"
               Header always set X-Generator "Joomla! 4.3"
 
@@ -521,11 +518,20 @@
         cmd: a2dissite 000-default.conf
         removes: /etc/apache2/sites-enabled/000-default.conf
 
+    # ─── Test Apache config before reloading ────────────────────
+    - name: Test Apache configuration syntax
+      ansible.builtin.command:
+        cmd: apache2ctl configtest
+      register: apache_configtest
+      changed_when: false
+      failed_when: "'Syntax OK' not in apache_configtest.stderr"
+
     # ─── Reload Apache to apply all vhosts ──────────────────────
     - name: Reload Apache2
       ansible.builtin.systemd:
         name: apache2
         state: reloaded
+
 
     # ─── /etc/hosts entries on lab1 itself ──────────────────────
     - name: Add simulated domain entries to /etc/hosts on lab1
