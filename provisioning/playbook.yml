@@ -119,7 +119,6 @@
         state: present
 
     # ─── Maltego CE ─────────────────────────────────────────────
-
     - name: Install Java (required for Maltego)
       ansible.builtin.apt:
         name: default-jre
@@ -160,6 +159,16 @@
         name: sherlock-project
         executable: pip3
         extra_args: --break-system-packages
+
+    # ─── /etc/hosts entries for simulated domains (inv1) ────────
+    - name: Add simulated domain entries to /etc/hosts on inv1
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} KYPO OSINT LAB DOMAINS"
+        block: |
+          192.168.10.10  www.silvercompany.com silvercompany.com
+          192.168.10.10  www.bluefeather.com bluefeather.com
+          192.168.10.10  www.famebook.com famebook.com
 
   # ─── Role ─────────────────────────────────────────────────────
   roles:
@@ -206,6 +215,8 @@
           - openssl
           - net-tools
           - dnsutils
+          - python3-flask
+          - python3-gunicorn
         state: present
         update_cache: 'yes'
 
@@ -268,13 +279,212 @@
         groups: docker
         append: true
 
-    # ─── Services ────────────────────────────────────────────────
-    - name: Enable and start Apache2
+    # ─── Apache vhost config: silvercompany.com ─────────────────
+    - name: Create silvercompany webroot
+      ansible.builtin.file:
+        path: /var/www/silvercompany
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    - name: Deploy silvercompany index.html
+      ansible.builtin.copy:
+        src: files/silvercompany/index.html
+        dest: /var/www/silvercompany/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Deploy silvercompany robots.txt
+      ansible.builtin.copy:
+        src: files/silvercompany/robots.txt
+        dest: /var/www/silvercompany/robots.txt
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Deploy silvercompany Apache vhost
+      ansible.builtin.copy:
+        dest: /etc/apache2/sites-available/silvercompany.conf
+        mode: '0644'
+        content: |
+          <VirtualHost *:80>
+              ServerName www.silvercompany.com
+              ServerAlias silvercompany.com
+              DocumentRoot /var/www/silvercompany
+              DirectoryIndex index.html
+
+              <Directory /var/www/silvercompany>
+                  Options -Indexes +FollowSymLinks
+                  AllowOverride None
+                  Require all granted
+              </Directory>
+
+              ServerTokens Full
+              Header always set X-Powered-By "PHP/8.3.1"
+              Header always set X-Generator "WordPress/6.4.2"
+
+              ErrorLog ${APACHE_LOG_DIR}/silvercompany_error.log
+              CustomLog ${APACHE_LOG_DIR}/silvercompany_access.log combined
+          </VirtualHost>
+
+    - name: Enable silvercompany vhost
+      ansible.builtin.command:
+        cmd: a2ensite silvercompany.conf
+        creates: /etc/apache2/sites-enabled/silvercompany.conf
+
+    # ─── Apache vhost config: bluefeather.com ───────────────────
+    - name: Create bluefeather webroot
+      ansible.builtin.file:
+        path: /var/www/bluefeather
+        state: directory
+        owner: www-data
+        group: www-data
+        mode: '0755'
+
+    - name: Deploy bluefeather index.html
+      ansible.builtin.copy:
+        src: files/bluefeather/index.html
+        dest: /var/www/bluefeather/index.html
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Deploy bluefeather robots.txt
+      ansible.builtin.copy:
+        src: files/bluefeather/robots.txt
+        dest: /var/www/bluefeather/robots.txt
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Deploy bluefeather Apache vhost
+      ansible.builtin.copy:
+        dest: /etc/apache2/sites-available/bluefeather.conf
+        mode: '0644'
+        content: |
+          <VirtualHost *:80>
+              ServerName www.bluefeather.com
+              ServerAlias bluefeather.com
+              DocumentRoot /var/www/bluefeather
+              DirectoryIndex index.html
+
+              <Directory /var/www/bluefeather>
+                  Options -Indexes +FollowSymLinks
+                  AllowOverride None
+                  Require all granted
+              </Directory>
+
+              ServerTokens Full
+              Header always set X-Powered-By "PHP/8.3.1"
+              Header always set X-Generator "Joomla! 4.3"
+
+              ErrorLog ${APACHE_LOG_DIR}/bluefeather_error.log
+              CustomLog ${APACHE_LOG_DIR}/bluefeather_access.log combined
+          </VirtualHost>
+
+    - name: Enable bluefeather vhost
+      ansible.builtin.command:
+        cmd: a2ensite bluefeather.conf
+        creates: /etc/apache2/sites-enabled/bluefeather.conf
+
+    # ─── Enable Apache headers module ───────────────────────────
+    - name: Enable Apache headers module
+      ansible.builtin.command:
+        cmd: a2enmod headers
+        creates: /etc/apache2/mods-enabled/headers.load
+
+    # ─── Famebook — Flask social media app ──────────────────────
+    - name: Create Famebook app directory
+      ansible.builtin.file:
+        path: /opt/famebook
+        state: directory
+        mode: '0755'
+
+    - name: Deploy Famebook Flask application
+      ansible.builtin.copy:
+        src: files/famebook/app.py
+        dest: /opt/famebook/app.py
+        mode: '0644'
+
+    - name: Create Famebook systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/famebook.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Famebook Social Media Simulation (Flask)
+          After=network.target
+
+          [Service]
+          ExecStart=/usr/bin/python3 /opt/famebook/app.py
+          WorkingDirectory=/opt/famebook
+          Restart=always
+          User=www-data
+          Group=www-data
+          Environment=FLASK_ENV=production
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable and start Famebook service
       ansible.builtin.systemd:
-        name: apache2
+        name: famebook
+        daemon_reload: true
         enabled: true
         state: started
 
+    - name: Deploy Famebook Apache reverse-proxy vhost
+      ansible.builtin.copy:
+        dest: /etc/apache2/sites-available/famebook.conf
+        mode: '0644'
+        content: |
+          <VirtualHost *:80>
+              ServerName www.famebook.com
+              ServerAlias famebook.com
+
+              ProxyPreserveHost On
+              ProxyPass        / http://127.0.0.1:5000/
+              ProxyPassReverse / http://127.0.0.1:5000/
+
+              ErrorLog  ${APACHE_LOG_DIR}/famebook_error.log
+              CustomLog ${APACHE_LOG_DIR}/famebook_access.log combined
+          </VirtualHost>
+
+    - name: Enable Apache proxy modules for Famebook
+      ansible.builtin.command:
+        cmd: a2enmod proxy proxy_http
+        creates: /etc/apache2/mods-enabled/proxy.load
+
+    - name: Enable famebook vhost
+      ansible.builtin.command:
+        cmd: a2ensite famebook.conf
+        creates: /etc/apache2/sites-enabled/famebook.conf
+
+    # ─── Disable default Apache vhost ───────────────────────────
+    - name: Disable default Apache vhost
+      ansible.builtin.command:
+        cmd: a2dissite 000-default.conf
+        removes: /etc/apache2/sites-enabled/000-default.conf
+
+    # ─── Reload Apache to apply all vhosts ──────────────────────
+    - name: Reload Apache2
+      ansible.builtin.systemd:
+        name: apache2
+        state: reloaded
+
+    # ─── /etc/hosts entries on lab1 itself ──────────────────────
+    - name: Add simulated domain entries to /etc/hosts on lab1
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        marker: "# {mark} KYPO OSINT LAB DOMAINS"
+        block: |
+          192.168.10.10  www.silvercompany.com silvercompany.com
+          192.168.10.10  www.bluefeather.com bluefeather.com
+          192.168.10.10  www.famebook.com famebook.com
+
+    # ─── Services ────────────────────────────────────────────────
     - name: Enable OpenSSH server
       ansible.builtin.systemd:
         name: ssh
