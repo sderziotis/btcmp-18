@@ -26,7 +26,6 @@ All three simulated web properties resolve to **lab1 (192.168.10.10)** via `/etc
 
 **Notes:**
 - Tor Browser is installed via `torbrowser-launcher` — user must run it once to complete download and setup.
-- Maltego CE v4.8.0 — update the deb URL in the playbook if stale. Requires registration on first launch.
 - SpiderFoot: `python3 sf.py -l 127.0.0.1:5001` from `/opt/spiderfoot`
 - Sherlock: `sherlock <username>` from terminal
 
@@ -87,7 +86,7 @@ All domains resolve to `192.168.10.10` (lab1) via `/etc/hosts` on both machines.
 
 ## DNS / Domain Resolution Strategy
 
-`/etc/hosts` entries are injected on **both** machines by the playbook using Ansible `blockinfile`:
+`/etc/hosts` entries are injected on **both** machines
 
 ```
 192.168.10.10  www.silvercompany.com silvercompany.com
@@ -95,20 +94,8 @@ All domains resolve to `192.168.10.10` (lab1) via `/etc/hosts` on both machines.
 192.168.10.10  www.famebook.com famebook.com
 ```
 
-This is the simplest and most reliable approach for a closed KYPO range — no dnsmasq or extra DNS server required. Apache ServerName/ServerAlias directives handle vhost routing based on the `Host:` header.
-
 ---
 
-## OSINT Challenge Ideas
-
-- Enumerate `robots.txt` on both corporate sites to discover hidden paths
-- Correlate staff emails across silvercompany.com and famebook.com profiles
-- Cross-reference Alexei Romanov's post about API keys with Tom Bekele's post
-- Find the connection between Blue Feather and Silver Company via blog post + Famebook posts
-- Use ExifTool / Sherlock / SpiderFoot on inv1 against the simulated targets
-- Fingerprint the server stack via HTTP response headers
-
----
 
 ## Notes
 - Docker is installed from the official Docker repository on both machines.
