@@ -221,14 +221,7 @@
         update_cache: 'yes'
 
 
-    # ─── Wait for apt lock ──────────────────────────────────────────
-    - name: Wait for apt lock to be released
-      ansible.builtin.shell:
-        cmd: >
-          while fuser /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock
-          /var/cache/apt/archives/lock /var/lib/dpkg/lock >/dev/null 2>&1;
-          do sleep 3; done
-        changed_when: false
+    # ─── Disable unattended-upgrades─────────────────────────────
 
     - name: Disable unattended-upgrades during provisioning
       ansible.builtin.systemd:
