@@ -124,21 +124,21 @@
         name: default-jre
         state: present
 
-    - name: Download Maltego CE deb package
-      ansible.builtin.get_url:
-        url: https://downloads.maltego.com/maltego-v4/linux/Maltego.v4.8.0.deb
-        dest: /tmp/maltego.deb
-        mode: '0644'
+    #- name: Download Maltego CE deb package
+    # ansible.builtin.get_url:
+    #    url: https://downloads.maltego.com/maltego-v4/linux/Maltego.v4.8.0.deb
+    #   dest: /tmp/maltego.deb
+    #    mode: '0644'
 
-    - name: Install Maltego CE
-      ansible.builtin.apt:
-        deb: /tmp/maltego.deb
-        state: present
+    #- name: Install Maltego CE
+    #  ansible.builtin.apt:
+    #    deb: /tmp/maltego.deb
+    #    state: present
 
-    - name: Remove Maltego deb package
-      ansible.builtin.file:
-        path: /tmp/maltego.deb
-        state: absent
+    #- name: Remove Maltego deb package
+    #  ansible.builtin.file:
+    #    path: /tmp/maltego.deb
+    #   state: absent
 
     # ─── SpiderFoot ─────────────────────────────────────────────
     - name: Clone SpiderFoot from GitHub
