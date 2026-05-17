@@ -22,7 +22,7 @@ All three simulated web properties resolve to **lab1 (192.168.10.10)** via `/etc
 ### INV1 — Investigator Workstation
 **User:** `user` / `Password123` (sudo enabled)
 
-**Software:** Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin, Tor Browser, Maltego CE, SpiderFoot, Sherlock, Java
+**Software:** Python3, pip, pipx, Node.js, npm, Git, build-essential, wget, curl, jq, unzip, zip, Firefox, Chromium, ExifTool, ffmpeg, ImageMagick, Docker Engine, Docker Compose plugin, Tor Browser, SpiderFoot, Sherlock, Java
 
 **Notes:**
 - Tor Browser is installed via `torbrowser-launcher` — user must run it once to complete download and setup.
