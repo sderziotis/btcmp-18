@@ -232,8 +232,8 @@
 
     - name: Disable unattended-upgrades during provisioning
       ansible.builtin.systemd:
-      name: unattended-upgrades
-      state: stopped
+        name: unattended-upgrades
+        state: stopped
       failed_when: false
 
     # ─── Docker ─────────────────────────────────────────────────
