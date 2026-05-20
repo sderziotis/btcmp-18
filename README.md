@@ -13,7 +13,7 @@ This lab environment uses **xubuntu-noble-x86_64** as the base image for both ma
 | inv1 | network-2 | 192.168.0.0/24 | 192.168.0.10 |
 | lab1 | network-3 | 192.168.10.0/24 | 192.168.10.10 |
 
-All three simulated web properties resolve to **lab1 (192.168.10.10)** via `/etc/hosts` entries injected on both machines.
+All three simulated web sites resolve to **lab1 (192.168.10.10)** via `/etc/hosts` entries injected on both machines.
 
 ---
 
@@ -40,7 +40,7 @@ All three simulated web properties resolve to **lab1 (192.168.10.10)** via `/etc
 
 ---
 
-## Simulated Web Properties
+## Simulated Web Sites
 
 All domains resolve to `192.168.10.10` (lab1) via `/etc/hosts` on both machines.
 
